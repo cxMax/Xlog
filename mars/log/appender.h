@@ -25,6 +25,8 @@
 #include <vector>
 #include <stdint.h>
 
+#include "xloggerbase.h"
+
 namespace mars {
 namespace xlog {
 
@@ -58,6 +60,8 @@ enum TConsoleFun {
 #endif
 
 void appender_open(const XLogConfig& _config);
+
+void appender_println(const XLoggerInfo* _info, const char* _log);
 
 void appender_flush();
 void appender_flush_sync();

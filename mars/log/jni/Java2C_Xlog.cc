@@ -203,6 +203,34 @@ JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_logWrite
 
 }
 
+JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_println(JNIEnv *env, jobject, int _level, jstring _tag, jstring _log) {
+
+    XLoggerInfo xlog_info;
+    gettimeofday(&xlog_info.timeval, NULL);
+    xlog_info.level = (TLogLevel)_level;
+
+    const char* tag_cstr = NULL;
+    const char* log_cstr = NULL;
+
+    if (NULL != _tag) {
+        tag_cstr = env->GetStringUTFChars(_tag, NULL);
+    }
+    if (NULL != _log) {
+        log_cstr = env->GetStringUTFChars(_log, NULL);
+    }
+
+    xlog_info.tag = NULL == tag_cstr ? "" : tag_cstr;
+
+    mars::xlog::appender_println(&xlog_info, NULL == log_cstr ? "NULL == log" : log_cstr);
+
+    if (NULL != _tag) {
+        env->ReleaseStringUTFChars(_tag, tag_cstr);
+    }
+    if (NULL != _log) {
+        env->ReleaseStringUTFChars(_log, log_cstr);
+    }
+}
+
 JNIEXPORT void JNICALL Java_com_tencent_mars_xlog_Xlog_logWrite2
   (JNIEnv *env, jclass, jlong _log_instance_ptr, int _level, jstring _tag, jstring _filename,
           jstring _funcname, jint _line, jint _pid, jlong _tid, jlong _maintid, jstring _log) {

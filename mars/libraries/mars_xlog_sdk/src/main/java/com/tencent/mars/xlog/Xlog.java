@@ -122,6 +122,8 @@ public class Xlog implements Log.LogImp {
 
 	public static native void logWrite(XLoggerInfo logInfo, String log);
 
+	public static native void println(int level, String tag, String log);
+
 	public static void logWrite2(int level, String tag, String filename, String funcname, int line, int pid, long tid, long maintid, String log){
 		logWrite2(0, level, tag, filename ,funcname, line, pid, tid, maintid, log);
 	}

@@ -292,17 +292,17 @@ void XloggerAppender::Open(const XLogConfig& _config) {
     bool use_mmap = false;
     if (OpenMmapFile(mmap_file_path, kBufferBlockLength, mmap_file_))  {
 	    if (_config.compress_mode_ == kZstd){
-		    log_buff_ = new LogZstdBuffer(mmap_file_.data(), kBufferBlockLength, true, _config.pub_key_.c_str(), _config.compress_level_);
+		    log_buff_ = new LogZstdBuffer(mmap_file_.data(), kBufferBlockLength, false, _config.pub_key_.c_str(), _config.compress_level_);
 	    }else {
-		    log_buff_ = new LogZlibBuffer(mmap_file_.data(), kBufferBlockLength, true, _config.pub_key_.c_str());
+		    log_buff_ = new LogZlibBuffer(mmap_file_.data(), kBufferBlockLength, false, _config.pub_key_.c_str());
 	    }
         use_mmap = true;
     } else {
         char* buffer = new char[kBufferBlockLength];
 	    if (_config.compress_mode_ == kZstd){
-		    log_buff_ = new LogZstdBuffer(buffer, kBufferBlockLength, true, _config.pub_key_.c_str(), _config.compress_level_);
+		    log_buff_ = new LogZstdBuffer(buffer, kBufferBlockLength, false, _config.pub_key_.c_str(), _config.compress_level_);
 	    } else {
-		    log_buff_ = new LogZlibBuffer(buffer, kBufferBlockLength, true, _config.pub_key_.c_str());
+		    log_buff_ = new LogZlibBuffer(buffer, kBufferBlockLength, false, _config.pub_key_.c_str());
 	    }
         use_mmap = false;
     }
@@ -320,7 +320,7 @@ void XloggerAppender::Open(const XLogConfig& _config) {
     SetMode(config_.mode_);
     lock.unlock();
 
-    char mark_info[512] = {0};
+    /*char mark_info[512] = {0};
     __GetMarkInfo(mark_info, sizeof(mark_info));
 
     if (buffer.Ptr()) {
@@ -356,7 +356,7 @@ void XloggerAppender::Open(const XLogConfig& _config) {
     
     boost::filesystem::space_info info = boost::filesystem::space(config_.logdir_);
     snprintf(logmsg, sizeof(logmsg), "log dir space info, capacity:%" PRIuMAX" free:%" PRIuMAX" available:%" PRIuMAX, info.capacity, info.free, info.available);
-    Write(nullptr, logmsg);
+    Write(nullptr, logmsg);*/
 }
 
 std::string XloggerAppender::__MakeLogFileNamePrefix(const timeval& _tv, const char* _prefix) {
@@ -1121,6 +1121,10 @@ void appender_open(const XLogConfig& _config) {
     sg_release_guard = false;
     xlogger_SetAppender(&xlogger_appender);
     BOOT_RUN_EXIT(appender_release_default_appender);
+}
+
+void appender_println(const XLoggerInfo* _info, const char* _log) {
+     ConsoleLog(_info, _log);
 }
 
 void appender_flush() {
