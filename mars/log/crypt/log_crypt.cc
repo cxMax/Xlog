@@ -168,7 +168,7 @@ void LogCrypt::UpdateLogHour(char* _data) {
 }
 
 uint32_t LogCrypt::GetLogLen(const char*  const _data, size_t _len) {
-    if (_len < GetHeaderLen()) return 0;
+    //if (_len < GetHeaderLen()) return 0;
     
     char start = _data[0];
     if (!LogMagicNum::MagicStartIsValid(start)) {
@@ -176,14 +176,14 @@ uint32_t LogCrypt::GetLogLen(const char*  const _data, size_t _len) {
     }
     
     uint32_t len = 0;
-    memcpy(&len, _data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char)*64, sizeof(len));
+    memcpy(&len, _data - sizeof(uint32_t) - sizeof(char)*64, sizeof(len));
     return len;
 }
 
 void LogCrypt::UpdateLogLen(char* _data, uint32_t _add_len) {
     
-    uint32_t currentlen = (uint32_t)(GetLogLen(_data, GetHeaderLen()) + _add_len);
-    memcpy(_data + GetHeaderLen() - sizeof(uint32_t) - sizeof(char) * 64, &currentlen, sizeof(currentlen));
+    uint32_t currentlen = (uint32_t)(GetLogLen(_data, 0) + _add_len);
+    memcpy(_data - sizeof(uint32_t) - sizeof(char) * 64, &currentlen, sizeof(currentlen));
 }
 
 void LogCrypt::SetHeaderInfo(char* _data, bool _is_async, char _magic_start) {
@@ -217,18 +217,18 @@ void LogCrypt::CryptSyncLog(const char* const _log_data,
                             AutoBuffer& _out_buff,
                             char _magic_start,
                             char _magic_end) {
-	_out_buff.AllocWrite(GetHeaderLen() + GetTailerLen() + _input_len);
+	_out_buff.AllocWrite(_input_len);
 
-    SetHeaderInfo((char*)_out_buff.Ptr(), false, _magic_start);
+    ///SetHeaderInfo((char*)_out_buff.Ptr(), false, _magic_start);
     
-    uint32_t header_len = GetHeaderLen();
+   // uint32_t header_len = GetHeaderLen();
     
     UpdateLogLen((char*)_out_buff.Ptr(), (uint32_t)_input_len);
     
-    SetTailerInfo((char*)_out_buff.Ptr() + _input_len + header_len, _magic_end);
+    //SetTailerInfo((char*)_out_buff.Ptr() + _input_len + header_len, _magic_end);
     
   //  if (!is_crypt_) {
-        memcpy((char*)_out_buff.Ptr() + header_len, _log_data, _input_len);
+        memcpy((char*)_out_buff.Ptr(), _log_data, _input_len);
     //    return;
     //}
 
